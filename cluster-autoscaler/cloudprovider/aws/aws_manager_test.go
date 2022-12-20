@@ -323,6 +323,10 @@ func TestExtractTaintsFromAsg(t *testing.T) {
 			Key:   aws.String("k8s.io/cluster-autoscaler/node-template/taint/nosplit"),
 			Value: aws.String("some_value"),
 		},
+		{
+			Key:   aws.String("k8s.io/cluster-autoscaler/node-template/taint/nvidia.com/gpu"),
+			Value: aws.String("present:NoSchedule"),
+		},
 	}
 
 	expectedTaints := []apiv1.Taint{
@@ -341,10 +345,15 @@ func TestExtractTaintsFromAsg(t *testing.T) {
 			Value:  "fizz",
 			Effect: apiv1.TaintEffectPreferNoSchedule,
 		},
+		{
+			Key:    "nvidia.com/gpu",
+			Value:  "present",
+			Effect: apiv1.TaintEffectNoSchedule,
+		},
 	}
 
 	taints := extractTaintsFromAsg(tags)
-	assert.Equal(t, 3, len(taints))
+	assert.Equal(t, 4, len(taints))
 	assert.Equal(t, makeTaintSet(expectedTaints), makeTaintSet(taints))
 }
 
